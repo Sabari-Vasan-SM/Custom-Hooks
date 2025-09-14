@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef, useContext, createContext } f
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
-  const cart = useCart({ persistKey: "shopping_cart" });
+  const cart = useCart();
   return <CartContext.Provider value={cart}>{children}</CartContext.Provider>;
 }
 
@@ -11,85 +11,76 @@ export function useGlobalCart() {
   return useContext(CartContext);
 }
 
-function useCart({ persistKey = null } = {}) {
-  // Initial state
-  const getInitial = () => {
-    if (persistKey) {
-      const saved = localStorage.getItem(persistKey);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  };
-
-  const [items, setItems] = useState(getInitial);
-  const [history, setHistory] = useState([getInitial()]);
+function useCart() {
+  const [items, setItems] = useState([]);
+  const [history, setHistory] = useState([[]]);
   const [pointer, setPointer] = useState(0);
 
-  // Persist in localStorage
-  useEffect(() => {
-    if (persistKey) localStorage.setItem(persistKey, JSON.stringify(items));
-  }, [items, persistKey]);
-
-  // Update history
-  const updateHistory = (newCart) => {
+  // Save history
+  const updateHistory = (newItems) => {
+    console.log("📜 History updated:", newItems);
     const newHistory = history.slice(0, pointer + 1);
-    newHistory.push(newCart);
+    newHistory.push(newItems);
     setHistory(newHistory);
     setPointer(newHistory.length - 1);
   };
 
-  // Actions
+  // Add item
   const addItem = useCallback((item) => {
+    console.log("➕ Adding item:", item);
     setItems((prev) => {
-      const newCart = [...prev, item];
-      updateHistory(newCart);
-      return newCart;
+      const newItems = [...prev, item];
+      updateHistory(newItems);
+      return newItems;
     });
   }, [history, pointer]);
 
+  // Remove item
   const removeItem = useCallback((id) => {
+    console.log("❌ Removing item with id:", id);
     setItems((prev) => {
-      const newCart = prev.filter((item) => item.id !== id);
-      updateHistory(newCart);
-      return newCart;
+      const newItems = prev.filter((i) => i.id !== id);
+      updateHistory(newItems);
+      return newItems;
     });
   }, [history, pointer]);
 
+  // Clear cart
   const clearCart = useCallback(() => {
+    console.log("🗑 Clearing cart");
     setItems([]);
     updateHistory([]);
   }, []);
 
-  // Undo / Redo
+  // Undo
   const undo = useCallback(() => {
     if (pointer > 0) {
-      const prevCart = history[pointer - 1];
+      console.log("↩ Undo called");
+      const prev = history[pointer - 1];
       setPointer(pointer - 1);
-      setItems(prevCart);
+      setItems(prev);
+    } else {
+      console.log("⚠ Undo not possible");
     }
   }, [pointer, history]);
 
+  // Redo
   const redo = useCallback(() => {
     if (pointer < history.length - 1) {
-      const nextCart = history[pointer + 1];
+      console.log("↪ Redo called");
+      const next = history[pointer + 1];
       setPointer(pointer + 1);
-      setItems(nextCart);
+      setItems(next);
+    } else {
+      console.log("⚠ Redo not possible");
     }
   }, [pointer, history]);
 
-  // Auto-clear after inactivity
-  const timeoutRef = useRef(null);
-  const resetTimeout = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      clearCart();
-    }, 1000 * 60 * 5); // 5 min
-  };
-
   useEffect(() => {
-    resetTimeout();
-    return () => clearTimeout(timeoutRef.current);
+    console.log("🛒 Current items:", items);
   }, [items]);
 
   return { items, addItem, removeItem, clearCart, undo, redo };
 }
+
+export default useCart;
