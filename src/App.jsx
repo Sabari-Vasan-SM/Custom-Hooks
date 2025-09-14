@@ -5,24 +5,31 @@ function CartControls() {
   const { items, addItem, removeItem, clearCart, undo, redo } = useGlobalCart();
 
   return (
-    <div className="card">
+    <div className="cart-container">
       <h2>🛒 Shopping Cart</h2>
-      <button onClick={() => addItem({ id: Date.now(), name: "Product " + (items.length + 1) })}>
-        Add Item
-      </button>
-      <button onClick={undo} style={{ marginLeft: "10px" }}>Undo</button>
-      <button onClick={redo} style={{ marginLeft: "10px" }}>Redo</button>
-      <button onClick={clearCart} style={{ marginLeft: "10px" }}>Clear Cart</button>
 
-      <ul>
-        {items.map((item) => (
-          <li key={item.id}>
-            {item.name} 
-            <button onClick={() => removeItem(item.id)} style={{ marginLeft: "10px" }}>
-              Remove
-            </button>
-          </li>
-        ))}
+      <div className="cart-actions">
+        <button className="btn primary" onClick={() => addItem({ id: Date.now(), name: "Product " + (items.length + 1) })}>
+          ➕ Add Item
+        </button>
+        <button className="btn" onClick={undo}>↩ Undo</button>
+        <button className="btn" onClick={redo}>↪ Redo</button>
+        <button className="btn danger" onClick={clearCart}>🗑 Clear</button>
+      </div>
+
+      <ul className="cart-list">
+        {items.length === 0 ? (
+          <p className="empty">Your cart is empty 🛍️</p>
+        ) : (
+          items.map((item) => (
+            <li key={item.id} className="cart-item">
+              <span>{item.name}</span>
+              <button className="btn small danger" onClick={() => removeItem(item.id)}>
+                Remove
+              </button>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );
@@ -31,8 +38,10 @@ function CartControls() {
 export default function App() {
   return (
     <CartProvider>
-      <h1>🛍️ Real-world Advanced Hook Example</h1>
-      <CartControls />
+      <div className="app">
+        <h1 className="title">🛍️ Real-world Advanced Hook Example</h1>
+        <CartControls />
+      </div>
     </CartProvider>
   );
 }
