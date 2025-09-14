@@ -1,50 +1,38 @@
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
-import { CounterProvider, useGlobalCounter } from "./hooks/useCounter";
+import { CartProvider, useGlobalCart } from "./hooks/useCart";
 
-function CounterControls() {
-  const {
-    count,
-    increment,
-    decrement,
-    reset,
-    undo,
-    redo,
-    startAutoIncrement,
-    stopAutoIncrement,
-  } = useGlobalCounter();
+function CartControls() {
+  const { items, addItem, removeItem, clearCart, undo, redo } = useGlobalCart();
 
   return (
     <div className="card">
-      <h2>Count: {count}</h2>
-      <button onClick={increment}>+ Step</button>
-      <button onClick={decrement} style={{ marginLeft: "10px" }}>- Step</button>
-      <button onClick={reset} style={{ marginLeft: "10px" }}>Reset</button>
+      <h2>🛒 Shopping Cart</h2>
+      <button onClick={() => addItem({ id: Date.now(), name: "Product " + (items.length + 1) })}>
+        Add Item
+      </button>
       <button onClick={undo} style={{ marginLeft: "10px" }}>Undo</button>
       <button onClick={redo} style={{ marginLeft: "10px" }}>Redo</button>
-      <button onClick={() => startAutoIncrement(500)} style={{ marginLeft: "10px" }}>Start Auto</button>
-      <button onClick={stopAutoIncrement} style={{ marginLeft: "10px" }}>Stop Auto</button>
+      <button onClick={clearCart} style={{ marginLeft: "10px" }}>Clear Cart</button>
+
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            {item.name} 
+            <button onClick={() => removeItem(item.id)} style={{ marginLeft: "10px" }}>
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <CounterProvider config={{ initialValue: 5, step: 2, persistKey: "advCounter" }}>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Ultra Advanced Counter Hook 🚀</h1>
-      <CounterControls />
-      <CounterControls /> {/* multiple components share same state */}
-    </CounterProvider>
+    <CartProvider>
+      <h1>🛍️ Real-world Advanced Hook Example</h1>
+      <CartControls />
+    </CartProvider>
   );
 }
-
-export default App;
