@@ -1,7 +1,5 @@
-// src/hooks/useCounter.js
 import { useState, useEffect, useCallback, useRef, useContext, createContext } from "react";
 
-// Context for global sharing
 const CounterContext = createContext(null);
 
 export function CounterProvider({ children, config }) {
@@ -18,7 +16,6 @@ export function useGlobalCounter() {
 }
 
 function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
-  // Load initial value (with persistence)
   const getInitial = () => {
     if (persistKey) {
       const saved = localStorage.getItem(persistKey);
@@ -31,12 +28,10 @@ function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
   const [history, setHistory] = useState([getInitial()]);
   const [pointer, setPointer] = useState(0);
 
-  // Save to localStorage when count changes
   useEffect(() => {
     if (persistKey) localStorage.setItem(persistKey, count);
   }, [count, persistKey]);
 
-  // Push new value into history
   const updateHistory = (newValue) => {
     const newHistory = history.slice(0, pointer + 1);
     newHistory.push(newValue);
@@ -44,7 +39,6 @@ function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
     setPointer(newHistory.length - 1);
   };
 
-  // Core actions
   const increment = useCallback(() => {
     setCount((c) => {
       const newValue = c + step;
@@ -66,7 +60,6 @@ function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
     updateHistory(initialValue);
   }, [initialValue]);
 
-  // Undo / Redo
   const undo = useCallback(() => {
     if (pointer > 0) {
       const prevValue = history[pointer - 1];
@@ -83,11 +76,10 @@ function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
     }
   }, [pointer, history]);
 
-  // Auto increment
   const intervalRef = useRef(null);
   const startAutoIncrement = useCallback(
     (interval = 1000) => {
-      if (intervalRef.current) return; // prevent duplicates
+      if (intervalRef.current) return;
       intervalRef.current = setInterval(() => {
         setCount((c) => {
           const newValue = c + step;
@@ -104,7 +96,6 @@ function useCounter({ initialValue = 0, step = 1, persistKey = null } = {}) {
     intervalRef.current = null;
   }, []);
 
-  // Custom event system
   const listeners = useRef([]);
   const subscribe = useCallback((fn) => {
     listeners.current.push(fn);

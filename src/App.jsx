@@ -4,8 +4,16 @@ import "./App.css";
 import { CounterProvider, useGlobalCounter } from "./hooks/useCounter";
 
 function CounterControls() {
-  const { count, increment, decrement, reset, undo, redo, startAutoIncrement, stopAutoIncrement } =
-    useGlobalCounter();
+  const {
+    count,
+    increment,
+    decrement,
+    reset,
+    undo,
+    redo,
+    startAutoIncrement,
+    stopAutoIncrement,
+  } = useGlobalCounter();
 
   return (
     <div className="card">
