@@ -4,7 +4,16 @@ import "./App.css";
 import useCounter from "./hooks/useCounter";
 
 function App() {
-  const { count, increment, decrement, reset } = useCounter(0);
+  const { count, increment, decrement, reset, startAutoIncrement } = useCounter({
+    initialValue: 10,
+    step: 2,
+    persistKey: "myCounter",
+  });
+
+  const handleAutoIncrement = () => {
+    const stop = startAutoIncrement(500); // auto increment every 500ms
+    setTimeout(stop, 5000); // stop after 5 seconds
+  };
 
   return (
     <>
@@ -16,22 +25,20 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      <h1>Advanced Counter Hook</h1>
       <div className="card">
-        <button onClick={increment}>count is {count}</button>
+        <h2>Count: {count}</h2>
+        <button onClick={increment}>+ Step</button>
         <button onClick={decrement} style={{ marginLeft: "10px" }}>
-          -
+          - Step
         </button>
         <button onClick={reset} style={{ marginLeft: "10px" }}>
           Reset
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        <button onClick={handleAutoIncrement} style={{ marginLeft: "10px" }}>
+          Auto Increment (5s)
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   );
 }
